@@ -1,0 +1,11 @@
+.svg-heading-container {
+    display: flex;
+    align-items: center;
+}
+
+.svg {
+    width: 6px;
+    height: 6px;
+    fill: currentColor;
+    margin-right: 5px; /* Расстояние между SVG и заголовком */
+}

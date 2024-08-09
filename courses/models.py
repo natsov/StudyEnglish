@@ -2,6 +2,14 @@ from django.db import models
 from django.contrib.auth.models import User
 
 
+class UserProfile(models.Model):
+    """Model for storing information about users."""
+    username = models.TextField(max_length=255, default='user')
+    password = models.TextField(max_length=20, default='')
+    email = models.TextField(default='')
+    date_of_birth = models.DateField(null=True, blank=True)
+
+
 class Course(models.Model):
     """Model for storing information about courses."""
     title = models.CharField(max_length=255)

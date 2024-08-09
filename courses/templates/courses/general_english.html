@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        .price-tag {
+            font-weight: 10;
+            color: grey;
+            font-size: 28px;
+        }
+
+        .btn.btn-primary {
+            background-color: black;
+            color: white;
+            border: 1px solid black;
+        }
+
+        .btn.btn-primary:hover {
+            background-color: white;
+            color: black;
+            border: 1px solid black;
+        }
+
+        .text-body-secondary {
+            text-align: justify;
+            margin-bottom: 20px;
+            max-width: 600px; /* Установка максимальной ширины блока */
+            margin: 0 0 10 0; /* Центрирование блока по горизонтали */
+        }
+
+        .custom-col {
+            flex: 0 0 200px; /* Фиксированная ширина колонки 200px */
+        }
+
+        .text-body-secondary strong {
+            font-weight: bold; /* Делаем текст внутри <strong> жирным */
+            color:black;
+        }
+
+        .custom-card {
+            width: 600px; /* Установка ширины блока */
+            margin: 0 0; /* Центрирование блока по горизонтали */
+            padding: 20px; /* Добавление внутренних отступов */
+            background-color: #f8f9fa; /* Цвет фона блока */
+            border: 1px solid #dee2e6; /* Граница блока */
+            border-radius: 8px; /* Скругление углов блока */
+        }
+</style>
+</head>
+    <body>
+
+{% include 'courses/header.html' %}
+
+<div class="container px-4 py-5">
+    <h1 class="pb-2 ">General English Course</h1>
+<div class="row row-cols-1 row-cols-md-3 align-items-md-center gx-15 g-5 py-5">
+      <div class="col d-flex flex-column align-items-start gap-8">
+<h4 class="text-body-secondary">Universal English language learning course <strong>for life</strong>. Covers all levels, from <strong>zero</strong> to fluency. The comprehensive program develops all language skills: speaking, listening comprehension, reading, and writing.</h4>        <a href="#" class="btn btn-primary btn-lg">Enroll in a course</a>
+      </div>
+
+      <div class="col-md-8">
+        <div class="row row-cols-1 row-cols-sm-2 gx-5 g-3">
+    <div class="col d-flex flex-column gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" fill="currentColor" class="bi bi-patch-check" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M10.354 6.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 1 1 .708-.708L7 8.793l2.646-2.647a.5.5 0 0 1 .708 0"/>
+                <path d="m10.273 2.513-.921-.944.715-.698.622.637.89-.011a2.89 2.89 0 0 1 2.924 2.924l-.01.89.636.622a2.89 2.89 0 0 1 0 4.134l-.637.622.011.89a2.89 2.89 0 0 1-2.924 2.924l-.89-.01-.622.636a2.89 2.89 0 0 1-4.134 0l-.622-.637-.89.011a2.89 2.89 0 0 1-2.924-2.924l.01-.89-.636-.622a2.89 2.89 0 0 1 0-4.134l.637-.622-.011-.89a2.89 2.89 0 0 1 2.924-2.924l.89.01.622-.636a2.89 2.89 0 0 1 4.134 0l-.715.698a1.89 1.89 0 0 0-2.704 0l-.92.944-1.32-.016a1.89 1.89 0 0 0-1.911 1.912l.016 1.318-.944.921a1.89 1.89 0 0 0 0 2.704l.944.92-.016 1.32a1.89 1.89 0 0 0 1.912 1.911l1.318-.016.921.944a1.89 1.89 0 0 0 2.704 0l.92-.944 1.32.016a1.89 1.89 0 0 0 1.911-1.912l-.016-1.318.944-.921a1.89 1.89 0 0 0 0-2.704l-.944-.92.016-1.32a1.89 1.89 0 0 0-1.912-1.911z"/>
+              </svg>
+            <h3 class="fw-semibold mb-0 text-body-emphasis">LEVELS OF TRAINING</h3>
+            <h4 class="text-body-secondary">Starter (A1) - Advanced (C1)</h4>
+          </div>
+
+          <div class="col d-flex flex-column gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" fill="currentColor" class="bi bi-patch-check" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M10.354 6.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 1 1 .708-.708L7 8.793l2.646-2.647a.5.5 0 0 1 .708 0"/>
+                <path d="m10.273 2.513-.921-.944.715-.698.622.637.89-.011a2.89 2.89 0 0 1 2.924 2.924l-.01.89.636.622a2.89 2.89 0 0 1 0 4.134l-.637.622.011.89a2.89 2.89 0 0 1-2.924 2.924l-.89-.01-.622.636a2.89 2.89 0 0 1-4.134 0l-.622-.637-.89.011a2.89 2.89 0 0 1-2.924-2.924l.01-.89-.636-.622a2.89 2.89 0 0 1 0-4.134l.637-.622-.011-.89a2.89 2.89 0 0 1 2.924-2.924l.89.01.622-.636a2.89 2.89 0 0 1 4.134 0l-.715.698a1.89 1.89 0 0 0-2.704 0l-.92.944-1.32-.016a1.89 1.89 0 0 0-1.911 1.912l.016 1.318-.944.921a1.89 1.89 0 0 0 0 2.704l.944.92-.016 1.32a1.89 1.89 0 0 0 1.912 1.911l1.318-.016.921.944a1.89 1.89 0 0 0 2.704 0l.92-.944 1.32.016a1.89 1.89 0 0 0 1.911-1.912l-.016-1.318.944-.921a1.89 1.89 0 0 0 0-2.704l-.944-.92.016-1.32a1.89 1.89 0 0 0-1.912-1.911z"/>
+            </svg>
+            <h3 class="fw-semibold mb-0 text-body-emphasis">INTENSITY AND VOLUME</h3>
+            <h4 class="text-body-secondary">2 lessons per week for 90 minutes.</h4>
+            <h4 class="text-body-secondary">Duration of training at each level is 9 months</h4>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+<div class="container">
+    <div class="row row-cols-1 row-cols-md-3 mb-2 text-center">
+      <div class="col">
+        <div class="card mb-4 rounded-3 shadow-sm">
+         <div class="card-header py-3" style="background-color: black; color:white;">
+    <h4 class="my-0 fw-normal">1 month</h4>
+</div>
+          <div class="card-body">
+<h1 class="card-title pricing-card-title"><span class="price-tag">from</span> 150<small class="text-body-secondary fw-light"> BYN</small></h1>            <ul class="list-unstyled mt-3 mb-4">
+              <h3 style="color:grey">8 lessons for 90 minutes</h3>
+                <h4 class="card-title pricing-card-title">Afternoon session <small class="text-body-secondary fw-light">150 BYN</small></h4>
+                <h4 class="card-title pricing-card-title">Evening session <small class="text-body-secondary fw-light">170 BYN</small></h4>
+            </ul>
+<!--            <button type="button" class="w-100 btn btn-lg btn-outline-primary">Sign up for free</button>-->
+          </div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="card mb-4 rounded-3 shadow-sm">
+          <div class="card-header py-3" style="background-color: black; color:white;">
+            <h4 class="my-0 fw-normal">3 month</h4>
+        </div>
+          <div class="card-body">
+<h1 class="card-title pricing-card-title"><span class="price-tag">from</span> 280<small class="text-body-secondary fw-light"> BYN</small></h1>            <ul class="list-unstyled mt-3 mb-4">
+              <h3 style="color:grey">24 lessons for 90 minutes</h3>
+                <h4 class="card-title pricing-card-title">Afternoon session <small class="text-body-secondary fw-light">280 BYN</small></h4>
+                <h4 class="card-title pricing-card-title">Evening session <small class="text-body-secondary fw-light">320 BYN</small></h4>
+            </ul>
+<!--            <button type="button" class="w-100 btn btn-lg btn-outline-primary">Sign up for free</button>-->
+          </div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="card mb-4 rounded-3 shadow-sm">
+          <div class="card-header py-3" style="background-color: black; color:white;">
+            <h4 class="my-0 fw-normal ">9 month</h4>
+        </div>
+          <div class="card-body">
+    <h1 class="card-title pricing-card-title"><span class="price-tag">from</span> 1200<small class="text-body-secondary fw-light"> BYN</small></h1>            <ul class="list-unstyled mt-3 mb-4">
+              <h3 style="color:grey">80 lessons for 90 minutes</h3>
+                <h4 class="card-title pricing-card-title">Afternoon session <small class="text-body-secondary fw-light">1200 BYN</small></h4>
+                <h4 class="card-title pricing-card-title">Evening session <small class="text-body-secondary fw-light">1400 BYN</small></h4>
+            </ul>
+<!--            <button type="button" class="w-100 btn btn-lg btn-outline-primary">Sign up for free</button>-->
+          </div>
+        </div>
+      </div>
+    </div>
+    </div>
+    {% include 'courses/footer.html' %}
+
+</body>
+</html>

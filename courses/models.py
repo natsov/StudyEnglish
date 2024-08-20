@@ -1,14 +1,10 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import AbstractUser
 
 
-class UserProfile(models.Model):
+class User(AbstractUser):
     """Model for storing information about users."""
-    username = models.TextField(max_length=255, default='user')
-    password = models.TextField(max_length=20, default='')
-    email = models.TextField(default='')
-    date_of_birth = models.DateField(null=True, blank=True)
-
+    pass
 
 class Course(models.Model):
     """Model for storing information about courses."""
@@ -17,8 +13,11 @@ class Course(models.Model):
     level = models.CharField(max_length=50)
     duration = models.CharField(max_length=50)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
-    created_data = models.DateField()
+    created_date = models.DateField()
+    students = models.ManyToManyField(User, related_name='enrolled_courses', blank=True)
 
+    def __str__(self):
+        return self.title
 
 class Lesson(models.Model):
     """Model for storing information about lessons in course"""

@@ -1,15 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+</head>
+<body>
 {% include 'courses/header.html' %}
-
-<div class="d-flex align-items-center py-4 bg-body-tertiary">
+<div class="container d-flex align-items-center py-5 bg-body-tertiary">
 <main class="form-signin w-100 m-auto">
-  {% csrf_token %}
-<form method="post" action="{% url 'user_login' %}">
+<form method="post">
+   {% csrf_token %}
   <h1 class="h3 mb-3 fw-normal">Please sign in</h1>
-
-    <div class="form-floating">
-      <input type="email" class="form-control" id="floatingInput" name="email" placeholder="name@example.com">
-      <label for="floatingInput">Email address</label>
+{{ form.errors }}
+ <div class="form-floating">
+      <input type="text" class="form-control" id="username" name="username" placeholder="Name">
+      <label for="username">Username</label>
     </div>
+<!--    <div class="form-floating">-->
+<!--      <input type="email" class="form-control" id="floatingInput" name="email" placeholder="name@example.com">-->
+<!--      <label for="floatingInput">Email address</label>-->
+<!--    </div>-->
     <div class="form-floating">
       <input type="password" class="form-control" id="floatingPassword" name="password" placeholder="Password">
       <label for="floatingPassword">Password</label>
@@ -26,3 +36,6 @@
   </form>
 </main>
   </div>
+
+</body>
+</html>

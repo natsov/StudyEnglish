@@ -1,62 +1,28 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        .price-tag {
-            font-weight: 10;
-            color: grey;
-            font-size: 28px;
-        }
+    <link rel="stylesheet" href="{% static 'css/general_english.css' %}">
 
-        .btn.btn-primary {
-            background-color: black;
-            color: white;
-            border: 1px solid black;
-        }
-
-        .btn.btn-primary:hover {
-            background-color: white;
-            color: black;
-            border: 1px solid black;
-        }
-
-        .text-body-secondary {
-            text-align: justify;
-            margin-bottom: 20px;
-            max-width: 600px; /* Установка максимальной ширины блока */
-            margin: 0 0 10 0; /* Центрирование блока по горизонтали */
-        }
-
-        .custom-col {
-            flex: 0 0 200px; /* Фиксированная ширина колонки 200px */
-        }
-
-        .text-body-secondary strong {
-            font-weight: bold; /* Делаем текст внутри <strong> жирным */
-            color:black;
-        }
-
-        .custom-card {
-            width: 600px; /* Установка ширины блока */
-            margin: 0 0; /* Центрирование блока по горизонтали */
-            padding: 20px; /* Добавление внутренних отступов */
-            background-color: #f8f9fa; /* Цвет фона блока */
-            border: 1px solid #dee2e6; /* Граница блока */
-            border-radius: 8px; /* Скругление углов блока */
-        }
-</style>
 </head>
-    <body>
 
+<body>
 {% include 'courses/header.html' %}
-
+{% block content %}
 <div class="container px-4 py-5">
     <h1 class="pb-2 ">General English Course</h1>
 <div class="row row-cols-1 row-cols-md-3 align-items-md-center gx-15 g-5 py-5">
       <div class="col d-flex flex-column align-items-start gap-8">
-<h4 class="text-body-secondary">Universal English language learning course <strong>for life</strong>. Covers all levels, from <strong>zero</strong> to fluency. The comprehensive program develops all language skills: speaking, listening comprehension, reading, and writing.</h4>        <a href="#" class="btn btn-primary btn-lg">Enroll in a course</a>
+<h4 class="text-body-secondary">Universal English language learning course <strong>for life</strong>. Covers all levels, from <strong>zero</strong> to fluency. The comprehensive program develops all language skills: speaking, listening comprehension, reading, and writing.</h4>
+          {% if user.is_authenticated %}
+
+          <a href="{% url 'placement_test' %}" class="btn btn-primary btn-lg">Enroll in a course</a>
+          {% else %}
+          <a href="{% url 'login' %}" class="btn btn-primary btn-lg">Enroll in a course</a>
+{% endif %}
       </div>
 
       <div class="col-md-8">
@@ -135,6 +101,6 @@
     </div>
     </div>
     {% include 'courses/footer.html' %}
-
+{% endblock %}
 </body>
 </html>

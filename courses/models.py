@@ -6,6 +6,7 @@ class User(AbstractUser):
     """Model for storing information about users."""
     pass
 
+
 class Course(models.Model):
     """Model for storing information about courses."""
     title = models.CharField(max_length=255)
@@ -18,6 +19,7 @@ class Course(models.Model):
 
     def __str__(self):
         return self.title
+
 
 class Lesson(models.Model):
     """Model for storing information about lessons in course"""
@@ -50,3 +52,10 @@ class Question(models.Model):
     correct_answer = models.CharField(max_length=255)
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
 
+
+class Test(models.Model):
+    """Model for storing questions for english level test"""
+    question_text = models.CharField(max_length=255)
+    choices = models.JSONField()
+    correct_answer = models.CharField(max_length=255)
+    number_of_points = models.IntegerField()

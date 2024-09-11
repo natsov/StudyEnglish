@@ -3,6 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <title>Login</title>
+    <style>
+        .error-box {
+            background-color: #ffcccc;
+            color: red;
+            padding: 50px;
+            margin-bottom: 10px;
+        }
+    </style>>
 </head>
 <body>
 {% include 'courses/header.html' %}
@@ -11,7 +19,11 @@
 <form method="post">
    {% csrf_token %}
   <h1 class="h3 mb-3 fw-normal">Please sign in</h1>
-{{ form.errors }}
+    {% if form.errors %}
+   <div class="error-box">
+   {{form.errors}}
+</div>
+    {% endif %}
  <div class="form-floating">
       <input type="text" class="form-control" id="username" name="username" placeholder="Name">
       <label for="username">Username</label>
@@ -25,12 +37,8 @@
       <label for="floatingPassword">Password</label>
     </div>
 
-    <div class="form-check text-start my-3">
-      <input class="form-check-input" type="checkbox" value="remember-me" id="flexCheckDefault">
-      <label class="form-check-label" for="flexCheckDefault">
-        Remember me
-      </label>
-    </div>
+  <p>If you don't have an account, <a href="{% url 'register' %}">register</a>.</p>
+
     <button class="btn btn-primary w-100 py-2" type="submit">Sign in</button>
     <p class="mt-5 mb-3 text-body-secondary">© 2017–2024</p>
   </form>

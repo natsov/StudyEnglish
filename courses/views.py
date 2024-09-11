@@ -1,9 +1,10 @@
+import random
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.contrib.auth.forms import UserCreationForm
 from django.views.generic import View
-
+from .models import Test
 from courses.forms import RegisterForm
 
 
@@ -11,8 +12,8 @@ def main(request):
     return render(request, 'courses/home.html', {})
 
 
-def about(request):
-    return render(request, 'courses/about.html', {})
+def placement_test(request):
+    return render(request, 'courses/placement_test.html', {})
 
 
 def general_english(request):
@@ -25,11 +26,6 @@ def express_english(request):
 
 def business_english(request):
     return render(request, 'courses/business_english.html')
-
-
-@login_required
-def profile_view(request):
-    return render(request, 'courses/profile.html')
 
 
 class Register(View):
@@ -56,3 +52,32 @@ class Register(View):
             'form': form
         }
         return render(request, self.template_name, context)
+
+
+@login_required
+def student_form(request):
+    return render(request, 'courses/student_form.html')
+
+
+# def test_view(request, id):
+#     test_instance = Test.objects.get(pk=id)
+#     if request.method == 'POST':
+#         form = TestForm(request.POST, test_instance=test_instance)
+#         if form.is_valid():
+#             pass
+#     else:
+#         form = TestForm(test_instance=test_instance)
+#     return render(request, 'test_template.html', {'form': form})
+
+def show_random_question(request):
+    user_points = 0  # Инициализируем переменную для баллов пользователя
+    if request.method == 'POST':
+        user_answer = request.POST.get('answer')
+        random_question = Test.objects.get(id=request.POST.get('question_id'))
+        if user_answer == random_question.correct_answer:
+            user_points += random_question.points
+    count = Test.objects.count()
+    random_index = random.randint(0, count - 1)
+    random_question = Test.objects.all()[random_index]
+
+    return render(request, 'courses/random_question.html', {'question': random_question, 'user_points': user_points})

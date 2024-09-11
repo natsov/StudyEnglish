@@ -1,44 +1,22 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        .svg-heading-container {
-            display: flex;
-            align-items: center;
-            margin-top:20px;
-        }
-
-        .svg {
-            width: 36px;
-            height: 36px;
-            fill: currentColor;
-            margin-right: 10px;
-            margin-bottom: 5px;
-        }
-
-        .icon-link {
-            color: grey; /* Цвет текста по умолчанию */
-            text-decoration: none; /* Убираем подчеркивание */
-        }
-
-        .icon-link:hover {
-            color: red; /* Цвет текста при наведении */
-        }
-
-    </style>
+    <link rel="stylesheet" href="{% static 'css/home.css' %}">
 </head>
 
 <body>
+
 {% include 'courses/header.html' %}
 <div class="position-relative overflow-hidden p-3 p-md-5 m-md-3 text-center bg-body-tertiary">
     <div class="col-md-6 p-lg-5 mx-auto my-5">
       <h1 class="display-3 fw-bold">Study English</h1>
       <h3 class="fw-normal text-muted mb-3">Learn anything you want with us</h3>
       <div class="d-flex gap-3 justify-content-center lead fw-normal">
-        <a class="icon-link" href="/about">
-          About us
+        <a class="icon-link" href="/placement_test">
+          Pass the level test
           <svg class="bi"><use xlink:href="#chevron-right"></use></svg>
         </a>
         <a class="icon-link" href="#">
@@ -59,8 +37,16 @@
           </a>
         <p class="lead">Comprehensive language learning, from scratch to fluency.</p>
       </div>
-      <div class="bg-body-tertiary shadow-sm mx-auto" style="width: 80%; height: 300px; border-radius: 21px 21px 0 0;"></div>
-    </div>
+      <div class="bg-body-tertiary shadow-sm mx-auto" style="width: 80%; height: 300px; border-radius: 21px 21px 0 0;">
+<div class="container text-into-box">
+            <h1 class="card-title pricing-card-title" style="color: #696969; font-weight: normal;">А1-С1<small class="text-body-secondary fw-light"> levels</small></h1>
+              <li class="text-main-page">9 months</li>
+              <li class="text-main-page">2 lessons per week for 90 minutes</li>
+              <li class="text-main-page">Afternoon/Evening sessions</li>
+          </div>
+        </div>
+        </div>
+
 
     <div class="bg-body-tertiary me-md-3 pt-3 px-3 pt-md-5 px-md-5 text-center overflow-hidden">
       <div class="my-3 p-3">
@@ -69,8 +55,15 @@
           </a>
         <p class="lead">An intensive course for those who need to learn quickly.</p>
       </div>
-      <div class="bg-dark shadow-sm mx-auto" style="width: 80%; height: 300px; border-radius: 21px 21px 0 0;"></div>
-    </div>
+      <div class="bg-dark shadow-sm mx-auto" style="width: 80%; height: 300px; border-radius: 21px 21px 0 0;">
+<div class="container text-into-box">
+            <h1 class="card-title pricing-card-title" style="color: grey; font-weight: normal;">А1-С1<small class="fw-light" style="color: grey;"> levels</small></h1>
+              <li class="text-main-page-white">6 months</li>
+              <li class="text-main-page-white">2 lessons per week for 135 minutes</li>
+              <li class="text-main-page-white">Afternoon/Evening sessions</li>
+          </div>
+          </div>
+        </div>
 
     <div class="text-bg-dark me-md-3 pt-3 px-3 pt-md-5 px-md-5 text-center overflow-hidden">
       <div class="my-3 py-3">
@@ -79,8 +72,15 @@
           </a>
         <p class="lead">A specialized course for those who need English for work.</p>
       </div>
-      <div class="bg-body-tertiary shadow-sm mx-auto" style="width: 80%; height: 300px; border-radius: 21px 21px 0 0;"></div>
-    </div>
+      <div class="bg-body-tertiary shadow-sm mx-auto" style="width: 80%; height: 300px; border-radius: 21px 21px 0 0; ">
+          <div class="container text-into-box">
+            <h1 class="card-title pricing-card-title" style="color: #696969; font-weight: normal;">А2-С1<small class="text-body-secondary fw-light"> levels</small></h1>
+              <li class="text-main-page">9 months</li>
+              <li class="text-main-page">2 lessons per week for 90 minutes</li>
+              <li class="text-main-page">Afternoon/Evening sessions</li>
+          </div>
+        </div>
+        </div>
   </div>
 
 <div class="container px-4 py-5" id="featured-3">
@@ -104,7 +104,7 @@
         <h3 class="fs-2 text-body-emphasis">Find out your language level</h3>
           </div>
         <p>Take a special test to determine your language level</p>
-        <a href="#" class="icon-link">
+        <a href="/placement_test" class="icon-link">
           Take the test
           <svg class="bi"><use xlink:href="#chevron-right"></use></svg>
         </a>
@@ -117,10 +117,18 @@
          </div>
 
         <p>Instructions will be sent to you via Email and Viber.</p>
-
       </div>
     </div>
 
+<div class="container center-container text-center">
+    <div class="row mb-2 justify-content-center">
+        <div class="col-md-3 themed-grid-col">A</div>
+            <div class="col-md-1"></div>
+        <div class="col-md-3 themed-grid-col">B</div>
+            <div class="col-md-1"></div>
+        <div class="col-md-3 themed-grid-col">C</div>
+    </div>
+</div>
 
 {% include 'courses/footer.html' %}
 

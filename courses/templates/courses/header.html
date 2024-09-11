@@ -50,10 +50,12 @@
 
        <div class="col-md-3 text-end">
     {% if user.is_authenticated %}
+           <div class="container"><h5>Hi, {{user.username}} </h5>
         <form action="{% url 'logout' %}" method="post">
             {% csrf_token %}
             <button type="submit" class="btn btn-outline-primary me-2">Logout</button>
         </form>
+               </div>
     {% else %}
         <a href="{% url 'login' %}" class="btn-link">
             <button type="button" class="btn btn-outline-primary me-2">Login</button>

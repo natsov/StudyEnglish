@@ -1,0 +1,23 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Results</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+
+<body>
+
+{% include 'courses/header.html' %}
+
+<div class="container">
+    <div class="result">
+    <h2>Congratulations! Your English: {{ level }}</h2>
+    <p>{{ english_level_info.description }}</p>
+</div>
+</div>
+
+</body>
+</html>

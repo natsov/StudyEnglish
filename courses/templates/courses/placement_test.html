@@ -8,7 +8,10 @@
         <h1 class="pb-2 ">Take the test to determine your English language level!</h1>
         <p class="lead">You can test your knowledge in just 20 minutes with the help of an exclusive online test.</p>
         <div class="d-grid gap-2 d-md-flex justify-content-md-start">
-          <a  href="/random_question"><button type="button" class="btn btn-primary btn-lg px-4 me-md-2">Take the test</button></a>
+          <form action="{% url 'random_question'%}" method="get">
+    <button type="submit" class="btn btn-primary btn-lg px-4 me-md-2">Take the test</button>
+</form>
+
         </div>
       </div>
     </div>

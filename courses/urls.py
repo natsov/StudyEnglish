@@ -12,4 +12,6 @@ urlpatterns = [
     path('student_form', views.student_form, name='student_form'),
     path('placement_test', views.placement_test, name='placement_test'),
     path('random_question', views.show_random_question, name='random_question'),
+    path('result_test', views.result_test, name='result_test'),
+    # path('random_question/<int:question_id>/', views.show_random_question, name='random_question'),
 ]

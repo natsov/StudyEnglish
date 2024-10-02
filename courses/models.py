@@ -59,3 +59,11 @@ class Test(models.Model):
     choices = models.JSONField()
     correct_answer = models.CharField(max_length=255)
     number_of_points = models.IntegerField()
+
+
+class EnglishLevelInfo(models.Model):
+    level = models.CharField(max_length=10)
+    description = models.TextField()
+
+    def __str__(self):
+        return self.level

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Form Already Filled</title>
+</head>
+<body>
+{% include 'courses/header.html' %}
+
+<div class="container py-5 text-center">
+    <h1>Thank you!</h1>
+    <p>Your form has already been filled.</p>
+
+    <!-- Кнопка для возврата на главную -->
+    <a href="/" class="btn btn-primary mt-3">Return to Home</a>
+
+    <!-- Кнопка для прохождения теста -->
+    <a href="placement_test" class="btn btn-success mt-3">Take Placement Test</a>
+</div>
+
+{% include 'courses/footer.html' %}
+</body>
+</html>

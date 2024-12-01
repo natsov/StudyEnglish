@@ -1,4 +1,9 @@
 {% include 'courses/header.html' %}
+{% if error_message %}
+    <div class="alert alert-danger" role="alert">
+        {{ error_message }}
+    </div>
+{% else %}
 
 <div class="container col-xxl-10 px-5 py-2">
     <div class="row flex-lg-row-reverse align-items-center g-5 py-5">
@@ -16,3 +21,5 @@
       </div>
     </div>
   </div>
+
+{% endif %}

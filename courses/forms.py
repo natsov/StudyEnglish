@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm
 from django import forms
+from .models import Course, Lesson, Exercise, Quiz, CourseRequest
 from .models import Test
 
 User = get_user_model()
@@ -11,16 +12,46 @@ class RegisterForm(UserCreationForm):
         model = User
 
 
-# class TestForm(forms.Form):
-#     class Meta:
-#         model = Test
-#         fields = ('question_text','choices')
+class CourseForm(forms.ModelForm):
+    class Meta:
+        model = Course
+        fields = ['title', 'level', 'duration']
+        widgets = {
+            'level': forms.Select(
+                choices=[('beginner', 'Beginner'), ('intermediate', 'Intermediate'), ('advanced', 'Advanced')]),
+        }
 
-# class TestForm(forms.Form):
-#     def __init__(self, *args, **kwargs):
-#         test_instance = kwargs.pop('test_instance')
-#         super(TestForm, self).__init__(*args, **kwargs)
-#
-#         self.fields['question_text'] = forms.CharField(label=test_instance.question_text)
-#         self.fields['choices'] = forms.ChoiceField(choices=[(choice, choice) for choice in test_instance.choices])
+class CourseRequestForm(forms.ModelForm):
+    class Meta:
+        model = CourseRequest
+        fields = ['course']
 
+    course = forms.ModelChoiceField(
+        queryset=Course.objects.all(),
+        label="Выберите курс",
+        widget=forms.Select(attrs={'class': 'form-control'}),
+    )
+
+
+class LessonForm(forms.ModelForm):
+    class Meta:
+        model = Lesson
+        fields = ['title', 'description', 'duration', 'content']
+
+
+class ExerciseForm(forms.ModelForm):
+    class Meta:
+        model = Exercise
+        fields = ['exercise_type', 'exercise_text', 'correct_answer']
+        widgets = {
+            'answer_choices': forms.Textarea(attrs={'rows': 3}),
+        }
+
+
+class QuizForm(forms.ModelForm):
+    class Meta:
+        model = Quiz
+        fields = ['title', 'description']
+        widgets = {
+            'questions': forms.Textarea(attrs={'rows': 3}),
+        }

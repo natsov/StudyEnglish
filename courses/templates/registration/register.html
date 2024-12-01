@@ -7,36 +7,45 @@
 <body>
 {% include 'courses/header.html' %}
 <div class="container d-flex align-items-center py-4 bg-body-tertiary">
-<main class="form-signin w-100 m-auto">
-<form action="{% url 'register' %}" method="post">
-   {% csrf_token %}
-  <h1 class="h3 mb-3 fw-normal">Please sign up</h1>
-{{ form.errors }}
- <div class="form-floating">
-      <input type="text" class="form-control" id="username" name="username" placeholder="Name">
-      <label for="username">Username</label>
-    </div>
-<!--    <div class="form-floating">-->
-<!--      <input type="email" class="form-control" id="email" name="email" placeholder="name@example.com">-->
-<!--      <label for="email">Email address</label>-->
-<!--    </div>-->
-<!--        <div class="form-floating">-->
-<!--      <input type="date" class="form-control" id="date" name="date" placeholder="">-->
-<!--      <label for="date">Date of birth</label>-->
-<!--    </div>-->
-    <div class="form-floating">
-      <input type="password" class="form-control" id="password1" name="password1" placeholder="Password">
-      <label for="password1">Password</label>
-    </div>
-    <div class="form-floating">
-      <input type="password" class="form-control" id="password2" name="password2" placeholder="Password">
-      <label for="password2">Confirm password</label>
-    </div>
-    <button class="btn btn-primary w-100 py-2" type="submit">Sign-up</button>
-    <p class="mt-5 mb-3 text-body-secondary">© 2017–2024</p>
-  </form>
-</main>
-  </div>
+    <main class="form-signin w-100 m-auto">
+        <form action="{% url 'register' %}" method="post">
+            {% csrf_token %}
+            <h1 class="h3 mb-3 fw-normal">Please sign up</h1>
+            {{ form.errors }}
+            <div class="form-floating">
+                <input type="text" class="form-control" id="username" name="username" placeholder="Name">
+                <label for="username">Username</label>
+            </div>
+
+
+            <div class="form-floating">
+                <input type="password" class="form-control" id="password1" name="password1" placeholder="Password">
+                <label for="password1">Password</label>
+            </div>
+            <div class="form-floating">
+                <input type="password" class="form-control" id="password2" name="password2" placeholder="Password">
+                <label for="password2">Confirm password</label>
+            </div>
+
+            <div class="form-check mt-3">
+                <input
+                        class="form-check-input"
+                        type="checkbox"
+                        id="is_teacher"
+                        name="is_teacher"
+                        value="true"
+                        {% if request.POST.is_teacher %} checked {% endif %}
+                >
+                <label class="form-check-label" for="is_teacher">
+                    Register as a Teacher
+                </label>
+            </div>
+
+            <button class="btn btn-primary w-100 py-2" type="submit">Sign-up</button>
+            <p class="mt-5 mb-3 text-body-secondary">© 2017–2024</p>
+        </form>
+    </main>
+</div>
 
 </body>
 </html>

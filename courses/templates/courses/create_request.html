@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Создание заявки</title>
+</head>
+<body>
+{% include 'courses/header.html' %}
+
+<div class="container">
+    <h1>Подать заявку на курс</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Отправить заявку</button>
+    </form>
+    <a href="{% url 'main' %}" class="btn btn-secondary">Вернуться на главную</a>
+</div>
+
+{% include 'courses/footer.html' %}
+</body>
+</html>

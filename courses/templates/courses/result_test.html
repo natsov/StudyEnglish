@@ -13,11 +13,16 @@
 {% include 'courses/header.html' %}
 
 <div class="container">
-    <div class="result">
-    <h2>Congratulations! Your English: {{ level }}</h2>
-    <p>{{ english_level_info.description }}</p>
+    <div class="result text-center py-5">
+        <h2>Congratulations! Your English Level: {{ level }}</h2>
+        <p>{{ english_level_info.description }}</p>
+
+        <!-- Кнопка для возврата на главную -->
+        <a href="/" class="btn btn-primary mt-4">Return to Home</a>
+    </div>
 </div>
-</div>
+
+{% include 'courses/footer.html' %}
 
 </body>
 </html>

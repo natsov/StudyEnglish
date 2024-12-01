@@ -93,7 +93,7 @@
     </div>
 
       <p>Fill out the required form online for further training</p>
-        <a href="#" class="icon-link">
+        <a href="/user_form" class="icon-link">
           Fill in the form
           <svg class="bi"><use xlink:href="#chevron-right"></use></svg>
         </a>
@@ -116,7 +116,10 @@
         <h3 class="fs-2 text-body-emphasis">Wait for notification about the start of classes</h3>
          </div>
 
-        <p>Instructions will be sent to you via Email and Viber.</p>
+        <p>Instructions will be sent to you via Email.</p>
+    {% if show_button %}
+        <a href="{% url 'info_email' %}" class="btn btn-primary mt-3">View Application Details</a>
+    {% endif %}
       </div>
     </div>
 

@@ -17,20 +17,20 @@
         {% for choice in question.choices %}
         <div class="list-group container">
             <label class="list-group-item d-flex gap-2">
-              <input class="form-check-input flex-shrink-0" type="radio" name="answer" value="{{ choice }}">
-              <span>
+                <input class="form-check-input flex-shrink-0" type="radio" name="answer" value="{{ choice }}">
+                <span>
                {{ choice }}
               </span>
             </label>
-          </div>
+        </div>
         {% endfor %}
     </ul>
     <input type="hidden" name="question_id" value="{{ question_id }}">
 
     {% if question_id == total_questions %}
-        <button type="submit" class="btn btn-finish btn-dark">Finish</button>
+    <button type="submit" class="btn btn-finish btn-dark">Finish</button>
     {% else %}
-        <button type="submit" class="btn btn-next btn-dark">Next question</button>
+    <button type="submit" class="btn btn-next btn-dark">Next question</button>
     {% endif %}
 </form>
 </body>

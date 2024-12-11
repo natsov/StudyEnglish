@@ -1,17 +1,18 @@
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
-from django.db.models import Avg
 from django.views.generic import View
-from courses.forms import RegisterForm, CourseRequestForm
-from .models import Lesson, Exercise, Quiz, TestResult, CourseRequest, Course, Test, EnglishLevelInfo
-from .forms import CourseForm, LessonForm, ExerciseForm, QuizForm
+from courses.forms import RegisterForm, LessonTheoryForm
+from .models import Lesson, Exercise, Quiz, TestResult, CourseRequest, Course, Test, EnglishLevelInfo, Question, \
+    ExerciseResult, LessonTheory
+from .forms import LessonForm, ExerciseForm, QuizForm
 from .decorators import teacher_required
 from django.shortcuts import redirect, render, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.models import AnonymousUser
 from django.utils import timezone
 from datetime import timedelta
+import re
 
 
 def main(request):
@@ -275,7 +276,7 @@ def info_email(request):
 
 def send_application(request, course_id):
     user = request.user
-    course = get_object_or_404(Course, id=course_id)  # Проверяем существование курса
+    course = get_object_or_404(Course, id=course_id)
 
     # Проверяем или создаём заявку
     course_request, created = CourseRequest.objects.get_or_create(
@@ -296,188 +297,80 @@ def send_application(request, course_id):
     else:
         messages.warning(request, f"Ваша заявка имеет статус: {course_request.status}. Изменения невозможны.")
 
-    # Перенаправляем на страницу информации с параметром course_id
     return redirect(f"{request.path_info}?course_id={course_id}")
 
 
 def student_profile(request):
     user = request.user
 
-    # Убедимся, что пользователь авторизован
     if not user.is_authenticated:
-        return redirect('login')  # Перенаправляем на страницу входа
+        return redirect('login')
 
-    # Получаем курсы, на которые записан студент
     enrolled_courses = user.enrolled_courses.all()
-
-    # Получаем результаты тестов
     test_results = TestResult.objects.filter(user=user).order_by('-test_date')
-
-    # Общая статистика
-    total_courses = enrolled_courses.count()
-    average_score = test_results.aggregate(Avg('score'))['score__avg'] if test_results else None
+    last_level_test = test_results.first()
 
     context = {
         'user': user,
         'enrolled_courses': enrolled_courses,
-        'test_results': test_results,
-        'total_courses': total_courses,
-        'average_score': average_score,
+        'last_level_test': last_level_test,
     }
     return render(request, 'courses/student_profile.html', context)
 
 
-def create_course_request(request):
-    if request.method == 'POST':
-        form = CourseRequestForm(request.POST)
-        if form.is_valid():
-            course_request = form.save(commit=False)
-            course_request.user = request.user
-            course_request.save()
-            messages.success(request, "Заявка успешно создана!")
-            return redirect('info_email')
-    else:
-        form = CourseRequestForm()
-    return render(request, 'courses/create_request.html', {'form': form})
 
 
 @teacher_required
 def teacher_dashboard(request):
-    """Отображение панели управления учителя."""
-    # Получаем все курсы, на которые записаны студенты данного учителя
-    courses = Course.objects.filter(students=request.user).prefetch_related('students')
+    user = request.user
+    profile_type = user.profile_type
 
-    # Получаем все заявки на курсы для этого учителя
-    user_requests = CourseRequest.objects.filter(course__students=request.user, status='Pending')
+    if profile_type:
+        courses = Course.objects.filter(title__icontains=profile_type)
+    else:
+        courses = Course.objects.none()
+    level_info = []
+    levels = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2']
 
-    context = {
+    for course in courses:
+        match = re.search(r'(A1|A2|B1|B2|C1|C2)', course.title)
+        if match:
+            level = match.group(0)
+            lessons_count = Lesson.objects.filter(course=course).count()
+            exercises_count = Exercise.objects.filter(lesson__course=course).count()
+            quizzes_count = Quiz.objects.filter(course=course).count()
+
+            level_info.append({
+                'course': course,
+                'level': level,
+                'lessons_count': lessons_count,
+                'exercises_count': exercises_count,
+                'quizzes_count': quizzes_count,
+            })
+
+    return render(request, 'teacher/teacher_dashboard.html', {
         'courses': courses,
-        'user_requests': user_requests,
-    }
-    return render(request, 'teacher/teacher_dashboard.html', context)
-
-
-# Создание нового курса
-@teacher_required
-def create_course(request):
-    """Создание нового курса."""
-    if request.method == 'POST':
-        form = CourseForm(request.POST)
-        if form.is_valid():
-            course = form.save(commit=False)
-            course.author = request.user
-            course.save()
-            return redirect('teacher_dashboard')
-    else:
-        form = CourseForm()
-    return render(request, 'teacher/create_course.html', {'form': form})
-
-# Редактирование курса
-@teacher_required
-def edit_course(request, course_id):
-    """Редактирование существующего курса."""
-    course = get_object_or_404(Course, id=course_id, author=request.user)
-    if request.method == 'POST':
-        form = CourseForm(request.POST, instance=course)
-        if form.is_valid():
-            form.save()
-            return redirect('teacher_dashboard')
-    else:
-        form = CourseForm(instance=course)
-    return render(request, 'teacher/edit_course.html', {'form': form, 'course': course})
-
-# Удаление курса
-@teacher_required
-def delete_course(request, course_id):
-    """Удаление курса."""
-    course = get_object_or_404(Course, id=course_id, author=request.user)
-    course.delete()
-    return redirect('teacher_dashboard')
-
-# Создание урока для курса
-@teacher_required
-def create_lesson(request, course_id):
-    """Создание урока для курса."""
-    course = get_object_or_404(Course, id=course_id, author=request.user)
-    if request.method == 'POST':
-        form = LessonForm(request.POST)
-        if form.is_valid():
-            lesson = form.save(commit=False)
-            lesson.course = course
-            lesson.save()
-            return redirect('edit_course', course_id=course.id)
-    else:
-        form = LessonForm()
-    return render(request, 'teacher/create_lesson.html', {'form': form, 'course': course})
-
-# Создание задания для урока
-@teacher_required
-@teacher_required
-def create_exercise(request, lesson_id):
-    """Создание упражнения для урока."""
-    lesson = get_object_or_404(Lesson, id=lesson_id, course__author=request.user)
-    if request.method == 'POST':
-        form = ExerciseForm(request.POST)
-        if form.is_valid():
-            exercise = form.save(commit=False)
-            exercise.lesson = lesson
-            exercise.save()
-            return redirect('edit_lesson', lesson_id=lesson.id)
-    else:
-        form = ExerciseForm()
-    return render(request, 'teacher/create_exercise.html', {'form': form, 'lesson': lesson})
-
-
-
-@teacher_required
-def edit_exercise(request, exercise_id):
-    """Редактирование существующего упражнения."""
-    exercise = get_object_or_404(Exercise, id=exercise_id, lesson__course__author=request.user)
-    if request.method == 'POST':
-        form = ExerciseForm(request.POST, instance=exercise)
-        if form.is_valid():
-            form.save()
-            return redirect('edit_lesson', lesson_id=exercise.lesson.id)
-    else:
-        form = ExerciseForm(instance=exercise)
-    return render(request, 'teacher/edit_exercise.html', {'form': form, 'exercise': exercise})
-
-
-@teacher_required
-def delete_exercise(request, exercise_id):
-    """Удаление упражнения."""
-    exercise = get_object_or_404(Exercise, id=exercise_id, lesson__course__author=request.user)
-    lesson_id = exercise.lesson.id
-    exercise.delete()
-    return redirect('edit_lesson', lesson_id=lesson_id)
-
-
-# Создание квиза для курса
-@teacher_required
-def create_quiz(request, course_id):
-    """Создание квиза для курса."""
-    course = get_object_or_404(Course, id=course_id, author=request.user)
-    if request.method == 'POST':
-        form = QuizForm(request.POST)
-        if form.is_valid():
-            quiz = form.save(commit=False)
-            quiz.course = course
-            quiz.save()
-            return redirect('edit_course', course_id=course.id)
-    else:
-        form = QuizForm()
-    return render(request, 'teacher/create_quiz.html', {'form': form, 'course': course})
+        'profile_type': profile_type,
+        'level_info': level_info,
+    })
 
 
 @teacher_required
 def approve_request(request, request_id):
-    """Одобрение запроса пользователя на участие в курсе."""
-    course_request = get_object_or_404(CourseRequest, id=request_id, course__author=request.user)
-    course_request.status = 'Approved'
-    course_request.save()
+    try:
+        course_request = get_object_or_404(CourseRequest, id=request_id)
+        course = course_request.course
 
-    # Добавляем студента в курс
-    course_request.course.students.add(course_request.user)
+        if course_request.user not in course.students.all():
+            course.students.add(course_request.user)
+            print(f"User {course_request.user} added to course {course.title}")
+        course_request.status = 'Approved'
+        course_request.save()
+        print(f"Request {course_request.id} approved successfully.")
+        messages.success(request, f"Заявка {course_request.user.username} на курс '{course.title}' одобрена.")
+    except Exception as e:
+        print(f"Error: {e}")
+        messages.error(request, "Произошла ошибка.")
     return redirect('teacher_dashboard')
 
 
@@ -487,60 +380,349 @@ def deny_request(request, request_id):
     course_request = get_object_or_404(CourseRequest, id=request_id, course__author=request.user)
     course_request.status = 'Denied'
     course_request.save()
+    messages.success(request, f"Заявка пользователя {course_request.user.username} на курс '{course_request.course.title}' была отклонена.")
     return redirect('teacher_dashboard')
+
+def course_detail(request, course_id):
+    course = get_object_or_404(Course, id=course_id)
+    lessons = Lesson.objects.filter(course=course)
+    quizzes = Quiz.objects.filter(course=course)
+
+    content = []
+    for lesson in lessons:
+        associated_quizzes = quizzes.filter(title__startswith=lesson.title.split()[0])
+        content.append({
+            'lesson': lesson,
+            'quizzes': associated_quizzes
+        })
+
+    context = {
+        'course': course,
+        'content': content,
+        'blocks': [1, 2, 3], 
+    }
+    return render(request, 'courses/course_detail.html', context)
+
+
+@teacher_required
+def add_exercise(request, lesson_id):
+    lesson = get_object_or_404(Lesson, id=lesson_id)
+    course = lesson.course
+    print(request.POST) 
+
+    if request.method == 'POST':
+        print("POST data received:", request.POST)
+        exercise_type = request.POST.get('exercise_type')
+
+        if exercise_type == 'multiple_choice':
+            form = ExerciseForm(request.POST, course=course)
+            if form.is_valid():
+                exercise = form.save(commit=False)
+                exercise.lesson = lesson
+                exercise.save()
+                print("Multiple Choice Exercise saved with ID:", exercise.id)
+                return redirect('view_course', course_id=course.id)
+
+        elif exercise_type == 'fill_in_the_blank':
+            blank_question = request.POST.get('blank_question')
+            blank_correct_answer = request.POST.get('blank_correct_answer')
+            exercise = Exercise.objects.create(
+                lesson=lesson,
+                exercise_type='fill_in_the_blank',
+                exercise_text=blank_question,
+                correct_answer=blank_correct_answer,
+            )
+            print("Fill in the Blank Exercise saved with ID:", exercise.id)
+            return redirect('view_course', course_id=course.id)
+
+        elif exercise_type == 'true_false':
+            correct_answer_tf = request.POST.get('correct_answer_tf')
+            exercise_text = request.POST.get('exercise_text')
+            exercise = Exercise.objects.create(
+                lesson=lesson,
+                exercise_type='true_false',
+                exercise_text=exercise_text,
+                correct_answer=correct_answer_tf,
+            )
+            print("True/False Exercise saved with ID:", exercise.id)
+            return redirect('view_course', course_id=course.id)
+
+        else:
+            print("Invalid exercise type")
+            return redirect('add_exercise', lesson_id=lesson.id)
+
+    else:
+        form = ExerciseForm(course=course)
+
+    return render(request, 'teacher/add_exercise.html', {'form': form, 'lesson': lesson, 'course': course})
+
+
+@teacher_required
+def add_quiz(request, course_id):
+    course = Course.objects.get(id=course_id)
+
+    if request.method == 'POST':
+        form = QuizForm(request.POST)
+        if form.is_valid():
+            quiz = form.save(commit=False)
+            quiz.course = course
+            quiz.save()
+            return redirect('teacher_dashboard')
+    else:
+        form = QuizForm()
+
+    return render(request, 'teacher/add_quiz.html', {'form': form, 'course': course})
+
+@teacher_required
+def add_lesson(request, course_id):
+    course = Course.objects.get(id=course_id)
+
+    if request.method == 'POST':
+        form = LessonForm(request.POST)
+        if form.is_valid():
+            lesson = form.save(commit=False)
+            lesson.course = course
+            lesson.save()
+            return redirect('teacher_dashboard')
+    else:
+        form = LessonForm()
+
+    return render(
+        request,
+        'teacher/add_lesson.html',
+        {'form': form, 'course': course}
+    )
+
+
+@teacher_required
+def view_course(request, course_id):
+    course = get_object_or_404(Course, id=course_id)
+    lessons = Lesson.objects.filter(course=course)
+    quizzes = Quiz.objects.filter(course=course)
+
+    return render(request, 'teacher/view_course.html', {
+        'course': course,
+        'lessons': lessons,
+        'quizzes': quizzes
+    })
 
 @teacher_required
 def edit_lesson(request, lesson_id):
-    """Редактирование существующего урока."""
-    lesson = get_object_or_404(Lesson, id=lesson_id, course__author=request.user)
+    lesson = get_object_or_404(Lesson, id=lesson_id)
+
     if request.method == 'POST':
         form = LessonForm(request.POST, instance=lesson)
         if form.is_valid():
             form.save()
-            return redirect('edit_course', course_id=lesson.course.id)
+            return redirect('view_course', course_id=lesson.course.id)
     else:
         form = LessonForm(instance=lesson)
+
     return render(request, 'teacher/edit_lesson.html', {'form': form, 'lesson': lesson})
 
 
 @teacher_required
-def delete_lesson(request, lesson_id):
-    """Удаление урока."""
-    lesson = get_object_or_404(Lesson, id=lesson_id, course__author=request.user)
-    course_id = lesson.course.id
-    lesson.delete()
-    return redirect('edit_course', course_id=course_id)
+def add_quiz(request, course_id):
+    course = get_object_or_404(Course, id=course_id)
 
+    if request.method == 'POST':
+        # Создание квиза
+        form = QuizForm(request.POST)
+        if form.is_valid():
+            quiz = form.save(commit=False)
+            quiz.course = course  # Привязываем квиз к курсу
+            quiz.save()
 
-# Редактирование квиза
+            # Обрабатываем добавление вопросов
+            question_count = len(request.POST) // 5  # Ожидаем, что каждый вопрос будет иметь 5 полей
+
+            for i in range(1, question_count + 1):
+                question_text = request.POST.get(f'question_text_{i}')
+                question_type = request.POST.get(f'question_type_{i}')
+                choices = request.POST.get(f'choices_{i}')
+                correct_answer = request.POST.get(f'correct_answer_{i}')
+                correct_answer_tf = request.POST.get(f'correct_answer_tf_{i}')
+
+                # Проверяем, что правильный ответ указан
+                if question_type in ['short_answer', 'true_false']:
+                    if not correct_answer and not correct_answer_tf:
+                        form.add_error(f'correct_answer_{i}', 'Correct answer is required.')
+
+                # Обработка типа вопроса и создание соответствующего вопроса
+                if question_type == 'multiple_choice':
+                    if choices:  # Проверяем, что choices не пустое
+                        choices_list = [choice.strip() for choice in choices.split(',')]  # Разделяем варианты по запятой
+                        question = Question.objects.create(
+                            question_text=question_text,
+                            question_type=question_type,
+                            choices=choices_list,
+                            correct_answer=correct_answer,
+                            quiz=quiz
+                        )
+                    else:
+                        # В случае отсутствия вариантов для multiple choice
+                        form.add_error(f'choices_{i}', 'Choices are required for multiple choice questions.')
+                elif question_type == 'short_answer':
+                    if correct_answer:  # Обрабатываем вопрос с правильным ответом
+                        question = Question.objects.create(
+                            question_text=question_text,
+                            question_type=question_type,
+                            correct_answer=correct_answer,
+                            quiz=quiz
+                        )
+                    else:
+                        form.add_error(f'correct_answer_{i}', 'Correct answer is required for short answer questions.')
+                elif question_type == 'true_false':
+                    if correct_answer_tf:  # Обрабатываем вопрос с правильным ответом для True/False
+                        question = Question.objects.create(
+                            question_text=question_text,
+                            question_type=question_type,
+                            correct_answer=correct_answer_tf,
+                            quiz=quiz
+                        )
+                    else:
+                        form.add_error(f'correct_answer_tf_{i}', 'Correct answer is required for true/false questions.')
+
+            if form.errors:
+                return render(request, 'teacher/add_quiz.html', {'form': form, 'course': course})
+
+            return redirect('teacher_dashboard')  # После добавления квиза и вопросов возвращаемся на панель учителя
+
+    else:
+        form = QuizForm()
+
+    return render(request, 'teacher/add_quiz.html', {'form': form, 'course': course})
+
 @teacher_required
 def edit_quiz(request, quiz_id):
-    """Редактирование квиза для курса."""
-    quiz = get_object_or_404(Quiz, id=quiz_id, course__author=request.user)
+    quiz = get_object_or_404(Quiz, id=quiz_id)
     if request.method == 'POST':
         form = QuizForm(request.POST, instance=quiz)
         if form.is_valid():
             form.save()
-            return redirect('edit_course', course_id=quiz.course.id)
+            for question in quiz.questions.all():
+                question_id = request.POST.get(f'question_id_{question.id}')
+                question_text = request.POST.get(f'question_text_{question.id}')
+                question_type = request.POST.get(f'question_type_{question.id}')
+                choices = request.POST.get(f'choices_{question.id}')
+                correct_answer = request.POST.get(f'correct_answer_{question.id}')
+                correct_answer_tf = request.POST.get(f'correct_answer_tf_{question.id}')
+                if not question_text or not question_type:
+                    continue
+                if question_id:
+                    question = get_object_or_404(Question, id=question_id)
+                else:
+                    question = Question(quiz=quiz)
+                question.question_text = question_text
+                question.question_type = question_type
+                if question_type == 'true_false':
+                    question.correct_answer = correct_answer_tf or "false"
+                else:
+                    question.correct_answer = correct_answer or ""
+                if question_type == 'multiple_choice' and choices:
+                    question.choices = [choice.strip() for choice in choices.split(',')]
+                question.save()
+            return redirect('teacher_dashboard')
     else:
         form = QuizForm(instance=quiz)
-    return render(request, 'teacher/edit_quiz.html', {'form': form, 'quiz': quiz})
 
-# Удаление квиза
+    return render(request, 'teacher/edit_quiz.html', {
+        'form': form,
+        'quiz': quiz,
+    })
+
+
+def view_lesson_exercises(request, lesson_id):
+    lesson = get_object_or_404(Lesson, id=lesson_id)
+    return render(request, 'courses/view_lesson_exercises.html', {'lesson': lesson})
+
+
+
+@login_required
+def exercise_view(request, lesson_id):
+    lesson = get_object_or_404(Lesson, id=lesson_id)
+
+    if request.method == "POST":
+        exercises = lesson.exercise_set.all()
+        total_questions = exercises.count()
+        correct_answers = 0
+        user_answers = {}
+
+        for exercise in exercises:
+            user_answer = request.POST.get(f"answer_{exercise.id}", "").strip()
+            is_correct = user_answer.lower() == exercise.correct_answer.lower()
+            user_answers[exercise.id] = user_answer
+            ExerciseResult.objects.create(
+                user=request.user,
+                lesson=lesson,
+                exercise=exercise,
+                user_answer=user_answer,
+                is_correct=is_correct
+            )
+            if is_correct:
+                correct_answers += 1
+
+        score = int((correct_answers / total_questions) * 100)
+
+        return render(request, 'courses/exercise_result.html', {
+            'lesson': lesson,
+            'total_questions': total_questions,
+            'correct_answers': correct_answers,
+            'score': score,
+            'user_answers': user_answers,
+        })
+
+    return render(request, 'courses/exercise_form.html', {
+        'lesson': lesson,
+    })
+
+
+def lesson_detail(request, lesson_id):
+    lesson = get_object_or_404(Lesson, id=lesson_id)
+    lesson_theory = LessonTheory.objects.filter(lesson=lesson)
+
+    return render(request, 'courses/lesson_detail.html', {
+        'lesson': lesson,
+        'lesson_theory': lesson_theory,
+    })
+
 @teacher_required
-def delete_quiz(request, quiz_id):
-    """Удаление квиза."""
-    quiz = get_object_or_404(Quiz, id=quiz_id, course__author=request.user)
-    course_id = quiz.course.id
-    quiz.delete()
-    return redirect('edit_course', course_id=course_id)
+def add_lesson_with_theory(request, course_id):
+    course = get_object_or_404(Course, id=course_id)
 
+    if request.method == 'POST':
+        lesson_form = LessonForm(request.POST)
+        if lesson_form.is_valid():
+            lesson = lesson_form.save(commit=False)
+            lesson.course = course
+            lesson.save()
 
-@teacher_required
-def course_detail(request, course_id):
-    """Детальная информация о курсе."""
-    course = get_object_or_404(Course, id=course_id, author=request.user)
-    return render(request, 'teacher/course_detail.html', {'course': course})
+            view_type = request.POST.get('theory_type')  # Изменено: используем корректное имя
+            if view_type == 'simple':
+                text_content = request.POST.get('simple_theory', '')  # Совпадает с именем в HTML
+                audio = request.FILES.get('audio_file', None)  # Совпадает с именем в HTML
+                LessonTheory.objects.create(
+                    lesson=lesson,
+                    view_type='text',
+                    text_content=text_content,
+                    audio=audio
+                )
+            elif view_type == 'table':
+                phrases = request.POST.getlist('table_key[]')  # Совпадает с именем в HTML
+                translations = request.POST.getlist('table_value[]')  # Совпадает с именем в HTML
+                for phrase, translation in zip(phrases, translations):
+                    LessonTheory.objects.create(
+                        lesson=lesson,
+                        view_type='table',
+                        phrase=phrase,
+                        translation=translation
+                    )
 
+            return redirect('view_course', course_id=course.id)
 
+    lesson_form = LessonForm()
+    return render(request, 'teacher/add_lesson_with_theory.html', {
+        'lesson_form': lesson_form,
+        'course': course,
+    })
 

@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Exercise</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css">
+</head>
+<body>
+{% include 'courses/header.html' %}
+
+<div class="container py-5">
+    <h1 class="text-center mb-4">Add Exercise to Lesson: {{ lesson.title }}</h1>
+
+    <form method="POST" action="{% url 'add_exercise' lesson.id %}">
+        {% csrf_token %}
+        <input type="hidden" name="lesson" value="{{ lesson.id }}">
+
+        <div class="mb-3">
+            <label for="exercise_type" class="form-label">Exercise Type</label>
+            <select name="exercise_type" id="exercise_type" class="form-control" required>
+                <option value="multiple_choice">Multiple Choice</option>
+                <option value="fill_in_the_blank">Fill in the Blank</option>
+                <option value="true_false">True/False</option>
+            </select>
+        </div>
+
+        <!-- Multiple Choice Fields -->
+        <div id="multiple_choice_fields" style="display: none;">
+            <div class="mb-3">
+                <label for="choices_container" class="form-label">Choices</label>
+                <div id="choices_container">
+                    <!-- Choices will be dynamically added here -->
+                </div>
+                <button type="button" class="btn btn-outline-secondary mb-3" id="add_choice">Add Choice</button>
+            </div>
+
+            <div class="mb-3">
+                <label for="correct_answer" class="form-label">Correct Answer</label>
+                <select name="correct_answer" id="correct_answer" class="form-control">
+                    <option value="">Select Correct Answer</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="fill_in_blank_fields" style="display: none;">
+            <!-- Field for entering the question text with a blank -->
+            <div class="mb-3">
+                <label for="blank_question" class="form-label">Question with a blank (use ____ for the blank)</label>
+                <textarea name="blank_question" id="blank_question" class="form-control" rows="4"
+                          placeholder="Example: The capital of France is ____"></textarea>
+            </div>
+
+            <!-- Field for entering the correct answer -->
+            <div class="mb-3">
+                <label for="blank_correct_answer" class="form-label">Correct Answer</label>
+                <input type="text" name="blank_correct_answer" id="blank_correct_answer" class="form-control"
+                       placeholder="Enter the correct answer for the blank">
+            </div>
+        </div>
+
+        <!-- True/False Fields -->
+        <div id="true_false_fields" style="display: none;">
+            <div class="mb-3">
+                <label for="correct_answer_tf" class="form-label">Correct Answer</label>
+                <select name="correct_answer_tf" id="correct_answer_tf" class="form-control">
+                    <option value="true">True</option>
+                    <option value="false">False</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Exercise Text -->
+        <div class="mb-3">
+            <label for="exercise_text" class="form-label">Exercise Text</label>
+            <textarea name="exercise_text" id="exercise_text" class="form-control" rows="4"></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Add Exercise</button>
+    </form>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+    const exerciseTypeSelect = document.getElementById('exercise_type');
+    const multipleChoiceFields = document.getElementById('multiple_choice_fields');
+    const fillInBlankFields = document.getElementById('fill_in_blank_fields');
+    const trueFalseFields = document.getElementById('true_false_fields');
+    const choicesContainer = document.getElementById('choices_container');
+    const addChoiceButton = document.getElementById('add_choice');
+    const correctAnswerSelect = document.getElementById('correct_answer');
+
+    // Обработчик события для изменения типа упражнения
+    exerciseTypeSelect.addEventListener('change', function() {
+        // Скрываем все поля
+        multipleChoiceFields.style.display = 'none';
+        fillInBlankFields.style.display = 'none';
+        trueFalseFields.style.display = 'none';
+
+        // Показываем только нужные поля в зависимости от выбранного типа
+        if (exerciseTypeSelect.value === 'multiple_choice') {
+            multipleChoiceFields.style.display = 'block';
+        } else if (exerciseTypeSelect.value === 'fill_in_the_blank') {
+            fillInBlankFields.style.display = 'block';
+        } else if (exerciseTypeSelect.value === 'true_false') {
+            trueFalseFields.style.display = 'block';
+        }
+    });
+
+    // Функция обновления списка правильных ответов для multiple_choice
+    function updateCorrectAnswerOptions() {
+        correctAnswerSelect.innerHTML = '<option value="">Select Correct Answer</option>';
+
+        // Получаем все текущие варианты ответа
+        const allChoices = Array.from(document.querySelectorAll('input[name="choices[]"]'))
+            .map(input => input.value.trim())
+            .filter(value => value); // Убираем пустые значения
+
+        // Добавляем их в выпадающий список
+        allChoices.forEach(choice => {
+            const option = document.createElement('option');
+            option.value = choice;
+            option.textContent = choice;
+            correctAnswerSelect.appendChild(option);
+        });
+    }
+
+    // Добавление нового варианта ответа
+    addChoiceButton.addEventListener('click', () => {
+        const choiceInputGroup = document.createElement('div');
+        choiceInputGroup.classList.add('input-group', 'mb-2');
+
+        const choiceInput = document.createElement('input');
+        choiceInput.type = 'text';
+        choiceInput.name = 'choices[]';
+        choiceInput.classList.add('form-control');
+        choiceInput.placeholder = `Option ${choicesContainer.children.length + 1}`;
+        choiceInput.required = true;
+
+        const removeButton = document.createElement('button');
+        removeButton.type = 'button';
+        removeButton.classList.add('btn', 'btn-outline-danger', 'remove_choice');
+        removeButton.textContent = 'Remove';
+
+        choiceInputGroup.appendChild(choiceInput);
+        choiceInputGroup.appendChild(removeButton);
+        choicesContainer.appendChild(choiceInputGroup);
+
+        choiceInput.addEventListener('input', updateCorrectAnswerOptions); // Обновляем при вводе
+        removeButton.addEventListener('click', () => {
+            choiceInputGroup.remove();
+            updateCorrectAnswerOptions(); // Обновляем при удалении
+        });
+
+        updateCorrectAnswerOptions(); // Обновляем выпадающий список правильного ответа
+    });
+
+    // Инициализируем начальное состояние формы
+    exerciseTypeSelect.dispatchEvent(new Event('change'));
+});
+
+</script>
+</body>
+</html>

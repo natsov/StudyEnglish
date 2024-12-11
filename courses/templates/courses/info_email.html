@@ -15,7 +15,6 @@
     </div>
     {% endif %}
 
-    <!-- Информация о пользователе -->
     <div class="mb-4">
         <p><strong>Имя:</strong> {{ user.first_name }}</p>
         <p><strong>Фамилия:</strong> {{ user.last_name }}</p>
@@ -24,25 +23,25 @@
         <p><strong>Курс:</strong> {{ next_course_name }}</p>
         <p><strong>Статус заявки: </strong>
             {% if course_status == 'Approved' %}
-                <span class="text-success">Одобрена</span>
+            <span class="text-success">Одобрена</span>
             {% elif course_status == 'Pending' %}
-                <span class="text-info">На рассмотрении</span>
+            <span class="text-info">На рассмотрении</span>
             {% elif course_status == 'Rejected' %}
-                <span class="text-danger">Отклонена</span>
+            <span class="text-danger">Отклонена</span>
             {% else %}
-                <span class="text-muted">Не подана</span>
+            <span class="text-muted">Не подана</span>
             {% endif %}
         </p>
     </div>
 
-   <!-- Кнопка для подачи заявки -->
-{% if show_apply_button %}
-<form action="{% url 'send_application' course_id=course_id %}" method="post" class="mb-3">
-    {% csrf_token %}
-    <button type="submit" class="btn btn-success">Отправить заявку</button>
-</form>
+    <!-- Кнопка для подачи заявки -->
+    {% if show_apply_button %}
+    <form action="{% url 'send_application' course_id=course_id %}" method="post" class="mb-3">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-success">Отправить заявку</button>
+    </form>
 
-{% endif %}
+    {% endif %}
 
     <!-- Кнопка возврата на главную -->
     <form action="{% url 'main' %}" method="post" class="mt-4">

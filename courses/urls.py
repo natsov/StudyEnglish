@@ -16,35 +16,25 @@ urlpatterns = [
     path('user_form', views.user_form, name='user_form'),
     path('info_email/', views.info_email, name='info_email'),
     path('send_application/<int:course_id>/', views.send_application, name='send_application'),
-    path('create_request/', views.create_course_request, name='create_course_request'),
     path('profile/', views.student_profile, name='student_profile'),
+    path('course/<int:course_id>/', views.course_detail, name='course_detail'),
+    path('lesson/<int:lesson_id>/view-exercises/', views.view_lesson_exercises, name='view_lesson_exercises'),
+    path('lesson/<int:lesson_id>/exercises/', views.exercise_view, name='exercise_view'),
+    path('lesson/<int:lesson_id>/detail/', views.lesson_detail, name='lesson_detail'),
+
+    # path('lesson/<int:lesson_id>/results/', views.exercise_result_view, name='exercise_result'),
+    path('course/<int:course_id>/add-lesson-with-theory/', views.add_lesson_with_theory, name='add_lesson_with_theory'),
 
     ###Teachers urls####
 
-    # Панель управления учителя
     path('teacher/dashboard/', views.teacher_dashboard, name='teacher_dashboard'),
-
-    # Управление курсами
-    path('teacher/course/create/', views.create_course, name='create_course'),
-    path('teacher/course/<int:course_id>/edit/', views.edit_course, name='edit_course'),
-    path('teacher/course/<int:course_id>/delete/', views.delete_course, name='delete_course'),
-
-    # Управление запросами пользователей
     path('teacher/request/<int:request_id>/approve/', views.approve_request, name='approve_request'),
     path('teacher/request/<int:request_id>/deny/', views.deny_request, name='deny_request'),
+    path('teacher/dashboard/<int:course_id>/', views.view_course, name='view_course'),
+    path('lesson/<int:lesson_id>/add-exercise/', views.add_exercise, name='add_exercise'),
+    path('course/<int:course_id>/add-quiz/', views.add_quiz, name='add_quiz'),
+    path('quiz/edit/<int:quiz_id>/', views.edit_quiz, name='edit_quiz'),
+    path('lesson/<int:lesson_id>/edit/', views.edit_lesson, name='edit_lesson'),
+    path('course/<int:course_id>/add-lesson/', views.add_lesson, name='add_lesson'),
 
-    # Управление уроками
-    path('teacher/lesson/<int:lesson_id>/edit/', views.edit_lesson, name='edit_lesson'),
-    path('teacher/lesson/<int:lesson_id>/delete/', views.delete_lesson, name='delete_lesson'),
-
-    # Управление квизами
-    path('teacher/quiz/<int:quiz_id>/edit/', views.edit_quiz, name='edit_quiz'),
-    path('teacher/quiz/<int:quiz_id>/delete/', views.delete_quiz, name='delete_quiz'),
-
-    # Управление упражнениями
-    path('teacher/lesson/<int:lesson_id>/exercise/create/', views.create_exercise, name='create_exercise'),
-    path('teacher/exercise/<int:exercise_id>/edit/', views.edit_exercise, name='edit_exercise'),
-    path('teacher/exercise/<int:exercise_id>/delete/', views.delete_exercise, name='delete_exercise'),
-
-    # path('random_question/<int:question_id>/', views.show_random_question, name='random_question'),
 ]

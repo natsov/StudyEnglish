@@ -19,12 +19,20 @@
             <p><strong>Country:</strong> {{ user.country }}</p>
 
             {% if enrolled_courses %}
-            {% with enrolled_courses.0 as course %}
-            <p><strong>Current Course:</strong> {{ course.title }}</p>
-            <a href="{% url 'course_detail' course.id %}" class="btn btn-primary">Go to Course</a>
-            {% endwith %}
+                {% for course_info in enrolled_courses %}
+                    <p><strong>Current Course:</strong> {{ course_info.course.title }}</p>
+
+                    {% if course_info.access_status == "Denied" %}
+                        <p class="text-danger">Your access to this course has been denied.</p>
+                    {% else %}
+                        <div class="d-flex gap-2">
+                            <a href="{% url 'course_detail' course_info.course.id %}" class="btn btn-primary">Go to Course</a>
+                            <a href="{% url 'course_journal' course_info.course.id %}" class="btn btn-secondary">View Journal</a>
+                        </div>
+                    {% endif %}
+                {% endfor %}
             {% else %}
-            <p><strong>Current Course:</strong> You are not enrolled in any course yet.</p>
+                <p><strong>Current Course:</strong> You are not enrolled in any course yet.</p>
             {% endif %}
         </div>
     </div>
@@ -33,11 +41,11 @@
         <div class="card-body">
             <h3>Last Level Test</h3>
             {% if last_level_test %}
-            <p><strong>Test Date:</strong> {{ last_level_test.test_date }}</p>
-            <p><strong>Score:</strong> {{ last_level_test.score }} points</p>
-            <p><strong>Level:</strong> {{ last_level_test.level }}</p>
+                <p><strong>Test Date:</strong> {{ last_level_test.test_date }}</p>
+                <p><strong>Score:</strong> {{ last_level_test.score }} points</p>
+                <p><strong>Level:</strong> {{ last_level_test.level }}</p>
             {% else %}
-            <p>You have not taken a level test yet.</p>
+                <p>You have not taken a level test yet.</p>
             {% endif %}
         </div>
     </div>

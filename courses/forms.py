@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm
 from django import forms
-from .models import Course, Lesson, Exercise, Quiz, CourseRequest, Question, LessonTheory
+from .models import Course, Lesson, Exercise, CourseRequest, LessonTheory
 from .models import Test
 
 User = get_user_model()
@@ -45,7 +45,7 @@ class LessonForm(forms.ModelForm):
 class LessonTheoryForm(forms.ModelForm):
     class Meta:
         model = LessonTheory
-        fields = ['view_type', 'phrase', 'translation', 'text_content', 'audio']
+        fields = ['view_type', 'phrase', 'translation', 'text_content']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -53,89 +53,93 @@ class LessonTheoryForm(forms.ModelForm):
         self.fields['phrase'].required = False
         self.fields['translation'].required = False
         self.fields['text_content'].required = False
-        self.fields['audio'].required = False
 
+
+import ast  # Для безопасного преобразования строки в список
 
 class ExerciseForm(forms.ModelForm):
-    lesson = forms.ModelChoiceField(
-        queryset=Lesson.objects.none(),
-        label="Select Lesson"
+    exercise_text = forms.CharField(
+        widget=forms.Textarea(attrs={'rows': 3, 'class': 'form-control'}),
+        label="Exercise Text"
     )
-    choices = forms.CharField(widget=forms.Textarea, required=False)
+    correct_answer = forms.CharField(
+        widget=forms.TextInput(attrs={'class': 'form-control'}),
+        label="Correct Answer"
+    )
+    choices = forms.CharField(
+        widget=forms.Textarea(attrs={'rows': 3, 'class': 'form-control'}),
+        required=False,
+        help_text="Enter choices as a Python list, e.g., ['choice1', 'choice2'].",
+        label="Choices"
+    )
 
     class Meta:
         model = Exercise
-        fields = ['exercise_type', 'exercise_text', 'correct_answer', 'lesson', 'choices']
+        fields = ['exercise_text', 'correct_answer', 'choices']
 
     def __init__(self, *args, **kwargs):
-        course = kwargs.pop('course', None)
+        self.exercise_type = kwargs.pop('exercise_type', None)
         super().__init__(*args, **kwargs)
-        if course:
-            self.fields['lesson'].queryset = course.lesson_set.all()
+
+        # Поле choices обязательно только для multiple_choice
+        if self.exercise_type == 'multiple_choice':
+            self.fields['choices'].required = True
+        else:
+            self.fields.pop('choices', None)
+
+        # Преобразование choices обратно в строку для редактирования
+        if 'instance' in kwargs:
+            instance = kwargs['instance']
+            if instance and instance.choices:
+                self.initial['choices'] = repr(instance.choices)
+
+    def clean_choices(self):
+        """Преобразует строку в список и валидирует choices."""
+        raw_choices = self.cleaned_data.get('choices', '')
+        try:
+            # Преобразуем строку в список через ast.literal_eval
+            choices = ast.literal_eval(raw_choices)
+            if not isinstance(choices, list):
+                raise ValueError("Choices must be a list.")
+            if len(choices) < 2:
+                raise forms.ValidationError("Provide at least two choices.")
+            return choices
+        except (ValueError, SyntaxError):
+            raise forms.ValidationError("Invalid format for choices. Use Python list format.")
 
     def clean(self):
+        """Общая валидация формы."""
         cleaned_data = super().clean()
-        exercise_type = cleaned_data.get('exercise_type')
+        correct_answer = cleaned_data.get('correct_answer', '').strip()
+        exercise_text = cleaned_data.get('exercise_text', '').strip()
+        choices = cleaned_data.get('choices', [])
 
         # Проверка для multiple_choice
-        if exercise_type == 'multiple_choice':
-            choices = self.clean_choices()
-            correct_answer = cleaned_data.get('correct_answer')
+        if self.exercise_type == 'multiple_choice':
             if correct_answer not in choices:
-                self.add_error('correct_answer', "Правильный ответ должен быть одним из вариантов.")
+                self.add_error('correct_answer', "Correct answer must be one of the choices.")
 
         # Проверка для fill_in_the_blank
-        elif exercise_type == 'fill_in_the_blank':
-            blank_question = self.data.get('blank_question', '').strip()
-            blank_correct_answer = self.data.get('blank_correct_answer', '').strip()
-
-            if not blank_question or "____" not in blank_question:
-                self.add_error('exercise_text', "Вопрос должен содержать пустое место (____).")
-            if not blank_correct_answer:
-                self.add_error('correct_answer', "Должен быть указан правильный ответ.")
-
-            # Устанавливаем очищенные значения
-            cleaned_data['exercise_text'] = blank_question
-            cleaned_data['correct_answer'] = blank_correct_answer
-            cleaned_data['choices'] = []  # Для этого типа вариантов ответа нет.
+        elif self.exercise_type == 'fill_in_the_blank':
+            if "____" not in exercise_text:
+                self.add_error('exercise_text', "Exercise text must contain '____' to represent the blank.")
+            cleaned_data['choices'] = []
 
         # Проверка для true_false
-        elif exercise_type == 'true_false':
-            correct_answer_tf = self.data.get('correct_answer_tf', '').strip()
-
-            if correct_answer_tf not in ['true', 'false']:
-                self.add_error('correct_answer', "Правильный ответ должен быть True или False.")
-
-            # Устанавливаем очищенные значения
-            cleaned_data['correct_answer'] = correct_answer_tf
-            cleaned_data['choices'] = []  # Для этого типа вариантов ответа нет.
+        elif self.exercise_type == 'true_false':
+            if correct_answer.lower() not in ['true', 'false']:
+                self.add_error('correct_answer', "Correct answer must be 'true' or 'false'.")
+            cleaned_data['choices'] = ['True', 'False']
 
         return cleaned_data
 
-    def clean_choices(self):
-        # Проверка на наличие вариантов ответа
-        raw_choices = self.data.getlist('choices[]')
-        choices = [choice.strip() for choice in raw_choices if choice.strip()]
-        if len(choices) < 2:
-            raise forms.ValidationError("Должно быть указано как минимум два варианта ответа.")
-        return choices
-
-    def clean_correct_answer(self):
-        correct_answer = self.cleaned_data.get('correct_answer', '').strip()
-        # Проверяем только для multiple_choice
-        if self.cleaned_data.get('exercise_type') == 'multiple_choice':
-            choices = self.clean_choices()
-            if correct_answer not in choices:
-                raise forms.ValidationError("Правильный ответ должен быть одним из вариантов.")
-        return correct_answer
-
-
-class QuizForm(forms.ModelForm):
-    class Meta:
-        model = Quiz
-        fields = ['title', 'description']
-
-class QuestionForm(forms.ModelForm):
-    class Meta:
-        model = Question
-        fields = ['question_text', 'question_type', 'choices', 'correct_answer']
+#
+# class QuizForm(forms.ModelForm):
+#     class Meta:
+#         model = Quiz
+#         fields = ['title', 'description']
+#
+# class QuestionForm(forms.ModelForm):
+#     class Meta:
+#         model = Question
+#         fields = ['question_text', 'question_type', 'choices', 'correct_answer']

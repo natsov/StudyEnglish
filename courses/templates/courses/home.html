@@ -5,6 +5,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{% static 'css/home.css' %}">
+    <style>
+        .btn-custom {
+    background-color: #731616 ;
+    color: white;
+    border: 1px solid #731616;
+    border-radius: 5px;
+    font-size: 16px;
+    padding: 5px 20px;
+    text-decoration: none;
+    margin-top:10px;
+}
+
+.btn-custom:hover {
+    background-color: white;
+    color: #731616;
+    border: 1px solid #731616;
+    text-decoration: none;
+}
+    </style>
 </head>
 
 <body>
@@ -131,20 +150,21 @@
 
     <p>Instructions will be sent to you via Email.</p>
     {% if show_button %}
-    <a href="{% url 'info_email' %}" class="btn btn-primary mt-3">View Application Details</a>
+
+    <a href="{% url 'info_email' %}" class="btn-custom">View Application Details</a>
     {% endif %}
 </div>
 </div>
 
-<div class="container center-container text-center">
-    <div class="row mb-2 justify-content-center">
-        <div class="col-md-3 themed-grid-col">A</div>
-        <div class="col-md-1"></div>
-        <div class="col-md-3 themed-grid-col">B</div>
-        <div class="col-md-1"></div>
-        <div class="col-md-3 themed-grid-col">C</div>
-    </div>
-</div>
+<!--<div class="container center-container text-center">-->
+<!--    <div class="row mb-2 justify-content-center">-->
+<!--        <div class="col-md-3 themed-grid-col">A</div>-->
+<!--        <div class="col-md-1"></div>-->
+<!--        <div class="col-md-3 themed-grid-col">B</div>-->
+<!--        <div class="col-md-1"></div>-->
+<!--        <div class="col-md-3 themed-grid-col">C</div>-->
+<!--    </div>-->
+<!--</div>-->
 
 {% include 'courses/footer.html' %}
 

@@ -1,26 +1,43 @@
-{% include 'courses/header.html' %}
-{% if error_message %}
-<div class="alert alert-danger" role="alert">
-    {{ error_message }}
-</div>
-{% else %}
+{%load static%}
 
-<div class="container col-xxl-10 px-5 py-2">
-    <div class="row flex-lg-row-reverse align-items-center g-5 py-5">
-        <div class="col-10 col-sm-8 col-lg-6">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>English Level Test</title>
+    <!-- Подключаем внешний CSS файл -->
+    <link rel="stylesheet" href="{% static 'css/placement_test.css' %}">
+    <!-- Подключаем другие необходимые стили или шрифты -->
+</head>
+<body>
+    {% include 'courses/header.html' %}
+
+    <div class="container col-xxl-10 px-5 py-2">
+        {% if error_message %}
+        <div class="alert alert-danger" role="alert">
+            {{ error_message }}
         </div>
-        <div class="col-lg-6">
-            <h1 class="pb-2 ">Take the test to determine your English language level!</h1>
-            <p class="lead">You can test your knowledge in just 20 minutes with the help of an exclusive online
+        {% else %}
+        <div class="row flex-lg-row-reverse align-items-center g-5 py-5">
+            <div class="col-10 col-sm-8 col-lg-6">
+                <!-- Здесь можно добавить изображение или что-то еще -->
+            </div>
+            <div class="col-lg-6">
+                <h1 class="pb-2">Take the test to determine your English language level!</h1>
+                <p class="lead">You can test your knowledge in just 20 minutes with the help of an exclusive online
                 test.</p>
-            <div class="d-grid gap-2 d-md-flex justify-content-md-start">
-                <form action="{% url 'random_question'%}" method="get">
-                    <button type="submit" class="btn btn-primary btn-lg px-4 me-md-2">Take the test</button>
-                </form>
-
+                <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+                    <!-- Форма для отправки на страницу с вопросами -->
+                    <form action="{% url 'random_question' %}" method="get">
+                        <button type="submit" class="btn-custom">Take the test</button>
+                    </form>
+                </div>
             </div>
         </div>
+        {% endif %}
     </div>
-</div>
 
-{% endif %}
+    <!-- Добавление других скриптов или файлов, если необходимо -->
+</body>
+</html>

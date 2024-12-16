@@ -5,22 +5,59 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Test Results</title>
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link rel="stylesheet" href="{% static 'css/result_test.css' %}">
+    <style>
+        .result {
+            background: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            margin: 0 auto;
+        }
+        .result h2 {
+            color: #731616;
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+        .result p {
+            font-size: 1rem;
+            line-height: 1.6;
+            color: #555;
+            margin-bottom: 30px;
+        }
+        .btn-custom {
+            display: inline-block;
+            padding: 10px 20px;
+            font-size: 16px;
+            color: white;
+            background-color: #731616;
+            text-decoration: none;
+            border: 1px solid #731616;
+            border-radius: 5px;
+            margin-top: 10px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        .btn-custom:hover {
+            background-color: white;
+            color: #731616;
+            border: 1px solid #731616;
+            text-decoration: none;
+        }
+    </style>
 </head>
-
 <body>
+    {% include 'courses/header.html' %}
 
-{% include 'courses/header.html' %}
-
-<div class="container">
-    <div class="result text-center py-5">
-        <h2>Congratulations! Your English Level: {{ level }}</h2>
-        <p>{{ english_level_info.description }}</p>
-        <a href="/" class="btn btn-primary mt-4">Return to Home</a>
+    <div class="container">
+        <div class="result text-center">
+            <h2>Congratulations! Your English Level: {{ level }}</h2>
+            <p>{{ english_level_info.description }}</p>
+            <a href="/" class="btn-custom">Return to Home</a>
+        </div>
     </div>
-</div>
 
-{% include 'courses/footer.html' %}
-
+    {% include 'courses/footer.html' %}
 </body>
 </html>

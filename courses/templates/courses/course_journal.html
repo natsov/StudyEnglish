@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Journal - {{ course.title }}</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css">
+</head>
+<body>
+{% include 'courses/header.html' %}
+
+<div class="container py-5">
+    <h1 class="text-center mb-4">Journal for {{ course.title }}</h1>
+
+    <table class="table table-striped">
+        <thead class="table-dark">
+            <tr>
+                <th>Lesson</th>
+                <th>Exercise</th>
+                <th>Result</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for exercise in exercises %}
+            <tr>
+                <td>{{ exercise.lesson_title }}</td>
+                <td>{{ exercise.exercise_text }}</td>
+                <td>
+                    {% if exercise.result == "Correct" %}
+                        <span class="text-success">{{ exercise.result }}</span>
+                    {% elif exercise.result == "Incorrect" %}
+                        <span class="text-danger">{{ exercise.result }}</span>
+                    {% else %}
+                        <span class="text-secondary">{{ exercise.result }}</span>
+                    {% endif %}
+                </td>
+                <td>{{ exercise.date|date:"d M Y, H:i" }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% include 'courses/footer.html' %}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

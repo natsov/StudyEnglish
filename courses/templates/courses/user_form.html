@@ -3,10 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    <style>
+
+        .btn-custom {
+            background-color: black;
+            color: white;
+            border: 1px solid #731616;
+            border-radius: 5px;
+            font-size: 16px;
+            height: 40px;
+        }
+
+        .btn-custom:hover {
+            background-color: white;
+            color: #731616;
+            border: 1px solid #731616;
+        }
+    </style>
 </head>
 <body>
 {% include 'courses/header.html' %}
-
 
 <div class="container">
     <main>
@@ -78,7 +94,7 @@
                         Please select a valid country.
                     </div>
                 </div>
-                <button class="w-100 btn btn-primary btn-lg" type="submit">Continue to checkout</button>
+                <button class="btn-custom" type="submit">Continue to checkout</button>
         </form>
     </main>
 

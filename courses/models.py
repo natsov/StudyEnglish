@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.utils.timezone import now
 
 
 class User(AbstractUser):
@@ -85,7 +86,6 @@ class LessonTheory(models.Model):
     phrase = models.CharField(max_length=255, blank=True, null=True)
     translation = models.CharField(max_length=255, blank=True, null=True)
     text_content = models.TextField(blank=True, null=True)
-    audio = models.FileField(upload_to='theory_audio/', blank=True, null=True)
 
     def __str__(self):
         return f"Theory for {self.lesson.title} ({self.view_type})"
@@ -108,33 +108,33 @@ class Exercise(models.Model):
         return f"Exercise: {self.exercise_text}"
 
 
-class Quiz(models.Model):
-    """Модель для квизов, связанных с курсом."""
-    title = models.CharField(max_length=255)
-    description = models.TextField()
-    course = models.ForeignKey('Course', on_delete=models.CASCADE)  # Связь с курсом
+# class Quiz(models.Model):
+#     """Модель для квизов, связанных с курсом."""
+#     title = models.CharField(max_length=255)
+#     description = models.TextField()
+#     course = models.ForeignKey('Course', on_delete=models.CASCADE)  # Связь с курсом
+#
+#     def __str__(self):
+#         return f"Quiz: {self.title} ({self.course})"
 
-    def __str__(self):
-        return f"Quiz: {self.title} ({self.course})"
 
-
-class Question(models.Model):
-    """Модель для вопросов в квизах."""
-    QUESTION_TYPE_CHOICES = [
-        ('multiple_choice', 'Multiple Choice'),
-        ('short_answer', 'Short Answer'),
-        ('true_false', 'True/False'),
-    ]
-
-    question_text = models.CharField(max_length=255)
-    question_type = models.CharField(max_length=20, choices=QUESTION_TYPE_CHOICES, default='short_answer')
-    choices = models.JSONField(blank=True, null=True)  # Для вариантов ответов в multiple choice
-    correct_answer = models.CharField(max_length=255)  # Для правильного ответа
-    quiz = models.ForeignKey(Quiz, related_name='questions', on_delete=models.CASCADE)
-
-    def __str__(self):
-        return f"Question: {self.question_text[:50]}..."
-
+# class Question(models.Model):
+#     """Модель для вопросов в квизах."""
+#     QUESTION_TYPE_CHOICES = [
+#         ('multiple_choice', 'Multiple Choice'),
+#         ('short_answer', 'Short Answer'),
+#         ('true_false', 'True/False'),
+#     ]
+#
+#     question_text = models.CharField(max_length=255)
+#     question_type = models.CharField(max_length=20, choices=QUESTION_TYPE_CHOICES, default='short_answer')
+#     choices = models.JSONField(blank=True, null=True)  # Для вариантов ответов в multiple choice
+#     correct_answer = models.CharField(max_length=255)  # Для правильного ответа
+#     quiz = models.ForeignKey(Quiz, related_name='questions', on_delete=models.CASCADE)
+#
+#     def __str__(self):
+#         return f"Question: {self.question_text[:50]}..."
+#
 class Test(models.Model):
     """Model for storing questions for english level test"""
     question_text = models.CharField(max_length=255)
@@ -174,13 +174,12 @@ class CourseRequest(models.Model):
 
 
 class ExerciseResult(models.Model):
-    """Модель для хранения результатов выполнения упражнений."""
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='exercise_results')
-    lesson = models.ForeignKey('Lesson', on_delete=models.CASCADE)
-    exercise = models.ForeignKey('Exercise', on_delete=models.CASCADE)
-    user_answer = models.TextField()
-    is_correct = models.BooleanField()
-    created_at = models.DateTimeField(auto_now_add=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE)
+    exercise = models.ForeignKey(Exercise, on_delete=models.CASCADE)
+    user_answer = models.TextField(blank=True, null=True)
+    is_correct = models.BooleanField(default=False)
+    created_at = models.DateTimeField(default=now)  # Поле для даты и времени создания
 
-    def __str__(self):
-        return f"Result for {self.user.username} | Lesson: {self.lesson.title} | Exercise: {self.exercise.exercise_text}"
+    class Meta:
+        unique_together = ('user', 'lesson', 'exercise')

@@ -1,7 +1,7 @@
 {% include 'courses/header.html' %}
 
 <div class="container py-5">
-    <h1 class="mb-4">Информация о заявке</h1>
+    <h1 class="mb-4">Information about student application</h1>
 
     {% if message %}
     <div class="alert alert-success" role="alert">
@@ -16,20 +16,20 @@
     {% endif %}
 
     <div class="mb-4">
-        <p><strong>Имя:</strong> {{ user.first_name }}</p>
-        <p><strong>Фамилия:</strong> {{ user.last_name }}</p>
+        <p><strong>First Name:</strong> {{ user.first_name }}</p>
+        <p><strong>Last Name:</strong> {{ user.last_name }}</p>
         <p><strong>Email:</strong> {{ user.email }}</p>
-        <p><strong>Страна:</strong> {{ user.country }}</p>
-        <p><strong>Курс:</strong> {{ next_course_name }}</p>
-        <p><strong>Статус заявки: </strong>
+        <p><strong>Country:</strong> {{ user.country }}</p>
+        <p><strong>Type course:</strong> {{ next_course_name }}</p>
+        <p><strong>Status of application: </strong>
             {% if course_status == 'Approved' %}
-            <span class="text-success">Одобрена</span>
+            <span class="text-success">Approved</span>
             {% elif course_status == 'Pending' %}
-            <span class="text-info">На рассмотрении</span>
-            {% elif course_status == 'Rejected' %}
-            <span class="text-danger">Отклонена</span>
+            <span class="text-info">Pending</span>
+            {% elif course_status == 'Denied' %}
+            <span class="text-danger">Denied</span>
             {% else %}
-            <span class="text-muted">Не подана</span>
+            <span class="text-muted">Not submitted</span>
             {% endif %}
         </p>
     </div>
@@ -38,7 +38,7 @@
     {% if show_apply_button %}
     <form action="{% url 'send_application' course_id=course_id %}" method="post" class="mb-3">
         {% csrf_token %}
-        <button type="submit" class="btn btn-success">Отправить заявку</button>
+        <button type="submit" class="btn btn-success">Send application</button>
     </form>
 
     {% endif %}
@@ -46,7 +46,7 @@
     <!-- Кнопка возврата на главную -->
     <form action="{% url 'main' %}" method="post" class="mt-4">
         {% csrf_token %}
-        <button type="submit" class="btn btn-secondary">На главную страницу</button>
+        <button type="submit" class="btn btn-secondary">Return home</button>
     </form>
 </div>
 
